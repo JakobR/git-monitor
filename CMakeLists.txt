@@ -8,6 +8,9 @@ project(helloworld VERSION "${version}" LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBGIT2 REQUIRED IMPORTED_TARGET libgit2)
+
 find_package(Qt6 REQUIRED COMPONENTS Widgets)
 qt_standard_project_setup()
 
@@ -17,7 +20,10 @@ qt_add_executable(helloworld
     src/main.cpp
 )
 
-target_link_libraries(helloworld PRIVATE Qt6::Widgets)
+target_link_libraries(helloworld PRIVATE
+    Qt6::Widgets
+    PkgConfig::LIBGIT2
+)
 
 set_target_properties(helloworld PROPERTIES
     WIN32_EXECUTABLE ON
