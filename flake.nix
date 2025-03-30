@@ -1,0 +1,58 @@
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+
+  outputs = inputs@{
+    self,
+    nixpkgs,
+    flake-utils,
+    ...
+  }:
+  flake-utils.lib.eachDefaultSystem (system:
+    let
+      pkgs = import nixpkgs {
+        inherit system;
+        config = { };
+      };
+
+      inherit (pkgs) lib;
+
+      qt = pkgs.qt6;
+
+      commonArgs = {
+        nativeBuildInputs = [
+          pkgs.cmake
+          pkgs.ninja
+          pkgs.pkg-config
+          # qttools
+          qt.wrapQtAppsHook
+        ];
+        buildInputs = with pkgs; [
+          qt.qtbase
+        ];
+      };
+
+      git-monitor = pkgs.stdenv.mkDerivation (commonArgs // {
+        pname = "git-monitor";
+        version = "0.0.1";
+        src = self;
+        meta = {
+          description = "Monitor git repositories and let you know when you forget to push, pull, or commit";
+          license = lib.licenses.gpl3;
+          mainProgram = "git-monitor";
+          inherit (qt.qtbase.meta) platforms;
+        };
+      });
+
+    in {
+      packages = {
+        default = git-monitor;
+        inherit git-monitor;
+      };
+
+      devShells.default = pkgs.mkShell commonArgs;
+    }
+  );
+}
