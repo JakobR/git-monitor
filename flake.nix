@@ -34,9 +34,16 @@
         ];
       };
 
+      # Read package version from CMakeLists
+      version = lib.pipe ./CMakeLists.txt [
+        builtins.readFile
+        (builtins.match ".*\nset\\(version[[:space:]]+\"([\\.[:digit:]]+)\"\\)\n.*")
+        builtins.head
+      ];
+
       git-monitor = pkgs.stdenv.mkDerivation (commonArgs // {
         pname = "git-monitor";
-        version = "0.0.1";
+        inherit version;
         src = self;
         meta = {
           description = "Monitor git repositories and let you know when you forget to push, pull, or commit";

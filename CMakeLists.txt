@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.21.1)
 
-project(helloworld VERSION 1.0.0 LANGUAGES CXX)
+# NOTE: the version setting is parsed by flake.nix, so be careful with changes.
+set(version "0.0.1")
+
+project(helloworld VERSION "${version}" LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
