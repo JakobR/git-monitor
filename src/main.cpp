@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <git2.h>
+#include <iostream>
 
 #include "mainwindow.h"
 
@@ -25,6 +26,25 @@ int status_cb(char const* path, unsigned int status_flags, void* payload)
 }
 
 
+int git_credential_acquire(git_credential** out, char const* url, char const* username_from_url, unsigned int allowed_types, void* payload)
+{
+    std::cout << "credential acquire\n";
+    std::cout << "    url: " << (url ? url : "<none>") << "\n";
+    std::cout << "    username: " << (username_from_url ? username_from_url : "<none>") << "\n";
+    std::cout << "    allowed types: " << allowed_types << "\n";
+    if (allowed_types & GIT_CREDENTIAL_SSH_KEY) {
+        std::cout << "    wants ssh key\n";
+    }
+    if (allowed_types & GIT_CREDENTIAL_USERPASS_PLAINTEXT) {
+        std::cout << "    wants username/password\n";
+    }
+    if (allowed_types & GIT_CREDENTIAL_USERNAME) {
+        std::cout << "    wants username\n";
+    }
+    return 1;
+}
+
+
 int main(int argc, char* argv[])
 {
     int error = 0;
@@ -43,7 +63,7 @@ int main(int argc, char* argv[])
 
     git_repository* repo = nullptr;
 
-    error = git_repository_open(&repo, "/home/jakob/projects/git-monitor");
+    error = git_repository_open(&repo, "/home/jakob/testrepo");
     if (error < 0) {
         git_error const* e = git_error_last();
         printf("Error %d/%d: %s\n", error, e->klass, e->message);
@@ -94,7 +114,7 @@ int main(int argc, char* argv[])
             printf("            src: %s\n", src);
             printf("            dst: %s\n", dst);
             printf("            force: %d\n", git_refspec_force(refspec));
-            printf("            direction: %d\n", git_refspec_direction(refspec));
+            printf("            direction: %d   (fetch=%d, push=%d)\n", git_refspec_direction(refspec), GIT_DIRECTION_FETCH, GIT_DIRECTION_PUSH);
         }
 
         git_strarray fetch_refspecs = {0};
@@ -108,8 +128,53 @@ int main(int argc, char* argv[])
             char const* refspec = fetch_refspecs.strings[i];
             printf("        fetch: %s\n", refspec);
         }
-        git_strarray_dispose(&fetch_refspecs);
 
+        git_remote_callbacks callbacks = GIT_REMOTE_CALLBACKS_INIT;
+        callbacks.credentials = git_credential_acquire;
+
+        error = git_remote_connect(remote, GIT_DIRECTION_FETCH, &callbacks, nullptr, nullptr);
+        if (error < 0) {
+            git_error const* e = git_error_last();
+            printf("Error %d/%d: %s\n", error, e->klass, e->message);
+            return error;
+        }
+
+        git_remote_head const** remote_heads;
+        size_t num_remote_heads;
+        error = git_remote_ls(&remote_heads, &num_remote_heads, remote);
+        if (error < 0) {
+            git_error const* e = git_error_last();
+            printf("Error %d/%d: %s\n", error, e->klass, e->message);
+            return error;
+        }
+
+        std::cout << std::endl;
+
+        for (size_t i = 0; i < num_remote_heads; ++i) {
+            git_remote_head const* remote_head = remote_heads[i];
+            std::cout << "remote_head " << i << ":\n";
+            std::cout << "    name: " << remote_head->name << "\n";
+            std::cout << "    symref_target: " << (remote_head->symref_target ? remote_head->symref_target : "<null>") << "\n";
+            std::cout << "    local: " << remote_head->local << "\n";
+            char oid[GIT_OID_SHA1_HEXSIZE + 1] = {0};
+            error = git_oid_fmt(oid, &remote_head->oid);
+            if (error < 0) {
+                git_error const* e = git_error_last();
+                printf("Error %d/%d: %s\n", error, e->klass, e->message);
+                return error;
+            }
+            std::cout << "    oid:  " << oid << "\n";
+            char loid[GIT_OID_SHA1_HEXSIZE + 1] = {0};
+            error = git_oid_fmt(loid, &remote_head->loid);
+            if (error < 0) {
+                git_error const* e = git_error_last();
+                printf("Error %d/%d: %s\n", error, e->klass, e->message);
+                return error;
+            }
+            std::cout << "    loid: " << loid << "\n";
+        }
+
+        git_strarray_dispose(&fetch_refspecs);
         git_remote_free(remote);
     }
 
