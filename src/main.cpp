@@ -25,6 +25,25 @@ int status_cb(char const* path, unsigned int status_flags, void* payload)
     return 0;
 }
 
+int fetchhead(char const* ref_name, char const* remote_url, git_oid const* oid, unsigned int is_merge, void* payload)
+{
+    std::cout << "fetchhead:\n";
+    std::cout << "    ref_name: " << (ref_name ? ref_name : "<null>") << "\n";
+    std::cout << "    remote_url: " << (remote_url ? remote_url : "<null>") << "\n";
+    if (oid) {
+        char oid_str[GIT_OID_SHA1_HEXSIZE + 1] = {0};
+        int error = git_oid_fmt(oid_str, oid);
+        if (error < 0) {
+            git_error const* e = git_error_last();
+            printf("Error %d/%d: %s\n", error, e->klass, e->message);
+            return error;
+        }
+        std::cout << "    oid:  " << oid_str << "\n";
+    }
+    std::cout << "    is_merge:  " << is_merge << "\n";
+    return 0;
+}
+
 
 int git_credential_acquire(git_credential** out, char const* url, char const* username_from_url, unsigned int allowed_types, void* payload)
 {
@@ -82,6 +101,12 @@ int main(int argc, char* argv[])
         GIT_STATUS_OPT_NO_REFRESH;  // unclear what this does
     error = git_status_foreach_ext(repo, &opts, status_cb, &my_data);
 
+    error = git_repository_fetchhead_foreach(repo, fetchhead, nullptr);
+    if (error < 0) {
+        git_error const* e = git_error_last();
+        printf("Error %d/%d: %s\n", error, e->klass, e->message);
+        return error;
+    }
 
     git_strarray remotes = {0};
     error = git_remote_list(&remotes, repo);
