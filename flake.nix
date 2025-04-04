@@ -26,7 +26,6 @@
           pkgs.cmake
           pkgs.ninja
           pkgs.pkg-config
-          # qttools
           qt.wrapQtAppsHook
         ];
         buildInputs = with pkgs; [
@@ -60,7 +59,14 @@
         inherit git-monitor;
       };
 
-      devShells.default = pkgs.mkShell commonArgs;
+      devShells.default = pkgs.mkShell (commonArgs // {
+        packages = [
+          qt.full
+          qt.qtlanguageserver
+          pkgs.qtcreator
+          pkgs.gdb
+        ];
+      });
     }
   );
 }
