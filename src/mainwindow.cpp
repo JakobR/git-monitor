@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "addrepodialog.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -16,4 +17,11 @@ MainWindow::~MainWindow()
 void MainWindow::on_addRepoButton_clicked()
 {
     qDebug() << "button clicked";
+    auto* dialog = new AddRepoDialog(this);
+    int result = dialog->exec();
+    dialog->deleteLater();
+    if (!result) {
+        qDebug() << "cancelled";
+    }
+    qDebug() << "result: " << result;
 }

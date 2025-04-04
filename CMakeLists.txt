@@ -20,6 +20,9 @@ qt_add_executable(git-monitor
     src/mainwindow.cpp
     src/mainwindow.h
     src/mainwindow.ui
+    src/addrepodialog.cpp
+    src/addrepodialog.h
+    src/addrepodialog.ui
 )
 
 target_link_libraries(git-monitor
