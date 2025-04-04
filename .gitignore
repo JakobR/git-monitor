@@ -1,3 +1,4 @@
 /.direnv/
+/CMakeLists.txt.user
 /build
 /result

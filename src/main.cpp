@@ -186,7 +186,7 @@ int main(int argc, char* argv[])
     // no need to all this if application is exiting
     git_libgit2_shutdown();
 
-    return 0;
+    // return 0;
 
     QApplication app(argc, argv);
     MainWindow w;

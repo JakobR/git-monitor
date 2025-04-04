@@ -12,3 +12,8 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::on_addRepoButton_clicked()
+{
+    qDebug() << "button clicked";
+}
