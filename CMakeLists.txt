@@ -22,9 +22,9 @@ qt_add_executable(git-monitor
     src/mainwindow.cpp
     src/mainwindow.h
     src/mainwindow.ui
-    src/addrepodialog.cpp
-    src/addrepodialog.h
-    src/addrepodialog.ui
+    src/editrepodialog.cpp
+    src/editrepodialog.h
+    src/editrepodialog.ui
     src/settings.h
     src/git/branch_iterator.cpp
     src/git/branch_iterator.h
