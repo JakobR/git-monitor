@@ -31,6 +31,7 @@
         buildInputs = with pkgs; [
           qt.qtbase
           pkgs.libgit2
+          pkgs.fmt_11
         ];
       };
 

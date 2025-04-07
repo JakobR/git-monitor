@@ -11,6 +11,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBGIT2 REQUIRED IMPORTED_TARGET libgit2)
 
+find_package(fmt REQUIRED)
+
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
 qt_standard_project_setup()
 
@@ -30,6 +32,7 @@ target_link_libraries(git-monitor
         Qt::Core
         Qt::Widgets
         PkgConfig::LIBGIT2
+        fmt::fmt
 )
 
 include(GNUInstallDirs)
