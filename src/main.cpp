@@ -31,7 +31,6 @@ int main(int argc, char* argv[])
         fmt::println("Total over all branches: {} ahead, {} behind, remote state: {} up to date, {} outdated", unpushed_all.ahead, unpushed_all.behind, remote_state.branches_up_to_date, remote_state.branches_outdated);
         if (!remote_state.errors.empty())
             fmt::println("Remote Errors:\n    {}", fmt::join(remote_state.errors, "\n    "));
-        // fmt::println("unfetched commits: head={} total={}", unfetched.head, unfetched.total);
         auto main = repo.lookup_local_branch("main");
         if (main) {
             auto main_upstream = main->branch_upstream();
@@ -42,6 +41,10 @@ int main(int argc, char* argv[])
     }
 
     // return 0;
+
+    QCoreApplication::setOrganizationName("Jakob Rath");
+    QCoreApplication::setOrganizationDomain("jakobrath.eu");
+    QCoreApplication::setApplicationName("Git Monitor");
 
     QApplication app(argc, argv);
     MainWindow w;

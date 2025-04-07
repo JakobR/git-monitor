@@ -25,6 +25,7 @@ qt_add_executable(git-monitor
     src/addrepodialog.cpp
     src/addrepodialog.h
     src/addrepodialog.ui
+    src/settings.h
     src/git/branch_iterator.cpp
     src/git/branch_iterator.h
     src/git/git.cpp

@@ -19,6 +19,13 @@ private slots:
     void on_addRepoButton_clicked();
 
 private:
-    Ui::MainWindow *ui;
+    void closeEvent(QCloseEvent* event) override;
+
+    void readSettings();
+    void writeSettings();
+
+private:
+    Ui::MainWindow* ui;
 };
+
 #endif // MAINWINDOW_H
