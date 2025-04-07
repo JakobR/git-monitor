@@ -1,12 +1,10 @@
+#include "mainwindow.h"
+#include "git/git.h"
+
 #include <QApplication>
-#include <git2.h>
-#include <iostream>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
 #include <fmt/std.h>
-
-#include "mainwindow.h"
-#include "git/repository.h"
 
 
 int main(int argc, char* argv[])
@@ -14,16 +12,10 @@ int main(int argc, char* argv[])
     int error = 0;
     qDebug() << "Starting";
 
-    git_libgit2_init();
+    git::libgit2_init();
 
-    int major, minor, rev;
-    error = git_libgit2_version(&major, &minor, &rev);
-    if (error < 0) {
-        git_error const* e = git_error_last();
-        printf("Error %d/%d: %s\n", error, e->klass, e->message);
-        return error;
-    }
-    fmt::println("libgit2 version %d.%d.%d", major, minor, rev);
+    auto version = git::libgit2_version();
+    fmt::println("libgit2 version %d.%d.%d", version.major, version.minor, version.rev);
 
     char const* repo_path = "/home/jakob/testrepo";
 
@@ -58,7 +50,7 @@ int main(int argc, char* argv[])
     qDebug() << "Exiting:" << result;
 
     // this is optional if the application is exiting anyway
-    // git_libgit2_shutdown();
+    git::libgit2_shutdown();
 
     return result;
 }
