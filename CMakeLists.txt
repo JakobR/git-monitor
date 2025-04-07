@@ -25,6 +25,18 @@ qt_add_executable(git-monitor
     src/addrepodialog.cpp
     src/addrepodialog.h
     src/addrepodialog.ui
+    src/git/branch_iterator.cpp
+    src/git/branch_iterator.h
+    src/git/oid.cpp
+    src/git/oid.h
+    src/git/reference.cpp
+    src/git/reference.h
+    src/git/remote.cpp
+    src/git/remote.h
+    src/git/repository.cpp
+    src/git/repository.h
+    src/git/util.cpp
+    src/git/util.h
 )
 
 target_link_libraries(git-monitor
