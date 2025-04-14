@@ -25,6 +25,8 @@ qt_add_executable(git-monitor
     src/editrepodialog.cpp
     src/editrepodialog.h
     src/editrepodialog.ui
+    src/repotablemodel.cpp
+    src/repotablemodel.h
     src/settings.h
     src/git/branch_iterator.cpp
     src/git/branch_iterator.h
