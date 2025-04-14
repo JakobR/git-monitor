@@ -11,4 +11,10 @@ namespace Settings {
 
     }
 
+    namespace RepoManager {
+
+        inline constexpr char const* Repos = "Repos";
+
+    }
+
 }

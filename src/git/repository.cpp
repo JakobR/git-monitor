@@ -346,25 +346,6 @@ remote_state_t repository::check_remote_state()
     return result;
 }
 
-
-// some of the stats we may want to act on in the monitor.
-// also, maybe for some repos, we don't want to track all branches, but set up a number of important branches to watch?
-struct status {
-    /// uncommitted changes
-    size_t uncommitted = 0;
-    /// unpushed commits on HEAD branch
-    size_t head_ahead = 0;
-    /// fetched but unmerged commits from the tracked remote on HEAD branch
-    size_t head_behind = 0;
-    /// unpushed commits across all branches
-    size_t total_ahead = 0;
-    /// fetched but unmerged commits from the respective tracked remote across all branches
-    size_t total_behind = 0;
-    bool head_unfetched = false;
-    size_t total_unfetched = 0;
-};
-
-
 auto fmt::formatter<branch_state>::format(branch_state tp, format_context& ctx) const -> format_context::iterator
 {
     string_view name = "<invalid>";

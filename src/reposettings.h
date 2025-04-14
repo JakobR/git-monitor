@@ -13,6 +13,8 @@ struct RepoSettings
     bool warnOnUnmergedCommits = true;
     bool warnOnUnfetchedCommits = true;
 
+    // TODO: maybe we want to add a setting to select a subset of branches to monitor?
+
     QVariantMap toVariantMap() const;
     static RepoSettings fromVariantMap(QVariantMap const& map);
 

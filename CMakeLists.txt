@@ -13,7 +13,7 @@ pkg_check_modules(LIBGIT2 REQUIRED IMPORTED_TARGET libgit2)
 
 find_package(fmt REQUIRED)
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
+find_package(Qt6 6.8 REQUIRED COMPONENTS Core Widgets Concurrent)
 qt_standard_project_setup()
 
 qt_add_executable(git-monitor
@@ -44,12 +44,17 @@ qt_add_executable(git-monitor
     src/git/util.h
     src/reposettings.h
     src/reposettings.cpp
+    src/repomanager.h
+    src/repomanager.cpp
+    src/repo.h
+    src/repo.cpp
 )
 
 target_link_libraries(git-monitor
     PRIVATE
         Qt::Core
         Qt::Widgets
+        Qt::Concurrent
         PkgConfig::LIBGIT2
         fmt::fmt
 )

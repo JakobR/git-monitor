@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "repomanager.h"
 #include "git/git.h"
 
 #include <QApplication>
@@ -48,6 +49,9 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationName("Git Monitor");
 
     QApplication app(argc, argv);
+
+    RepoManager repoManager;
+
     MainWindow w;
     w.show();
     int result = app.exec();
