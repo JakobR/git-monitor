@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QDialog>
+#include "reposettings.h"
 
 namespace Ui {
 class EditRepoDialog;
@@ -19,6 +20,9 @@ public:
     // Prepare dialog for editing the given repo.
     // If the given pointer is null, prepare for adding a new repo.
     void prepare(RepoSettings* repo);
+
+    void setValues(RepoSettings& repo);
+    RepoSettings values() const;
 
 private slots:
     void on_pathBrowseButton_clicked();
