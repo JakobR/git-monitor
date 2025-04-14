@@ -24,6 +24,9 @@ public:
     void setValues(RepoSettings& repo);
     RepoSettings values() const;
 
+public slots:
+    void accept() override;
+
 private slots:
     void on_pathBrowseButton_clicked();
 

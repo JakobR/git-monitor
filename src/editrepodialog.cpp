@@ -1,6 +1,7 @@
 #include "editrepodialog.h"
 #include "ui_editrepodialog.h"
 #include <QFileDialog>
+#include <QMessageBox>
 
 EditRepoDialog::EditRepoDialog(QWidget *parent)
     : QDialog(parent)
@@ -55,4 +56,21 @@ void EditRepoDialog::on_pathBrowseButton_clicked()
     if (dir.isNull())
         return;  // the user pressed 'Cancel'
     ui->pathEdit->setText(dir);
+}
+
+void EditRepoDialog::accept()
+{
+    RepoSettings rs = values();
+    auto errors = rs.validate();
+
+    if (errors.isEmpty())
+        QDialog::accept();
+    else {
+        QString text = tr("Unable to validate repository settings.\n\nError:");
+        for (QString const& error : errors) {
+            text += "\n- ";
+            text += error;
+        }
+        QMessageBox::critical(this, tr("Error"), text);
+    }
 }
