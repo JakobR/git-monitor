@@ -42,6 +42,8 @@ qt_add_executable(git-monitor
     src/git/repository.h
     src/git/util.cpp
     src/git/util.h
+    src/reposettings.h
+    src/reposettings.cpp
 )
 
 target_link_libraries(git-monitor
