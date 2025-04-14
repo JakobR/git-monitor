@@ -23,3 +23,8 @@ version_t git::libgit2_version()
     throw_on_git2_error(error);
     return ver;
 }
+
+std::ostream& version_t::display(std::ostream& out) const
+{
+    return out << "v" << major << "." << minor << "." << rev;
+}

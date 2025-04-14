@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <fmt/format.h>
+#include <fmt/ostream.h>
 #include <fmt/ranges.h>
 #include <fmt/std.h>
 
@@ -15,7 +16,7 @@ int main(int argc, char* argv[])
     git::libgit2_init();
 
     auto version = git::libgit2_version();
-    fmt::println("libgit2 version %d.%d.%d", version.major, version.minor, version.rev);
+    fmt::println("libgit2 {}", fmt::streamed(version));
 
     char const* repo_path = "/home/jakob/testrepo";
 

@@ -4,6 +4,7 @@
 #include "reference.h"
 #include "remote.h"
 #include "oid.h"
+#include <ostream>
 
 namespace git {
 
@@ -14,7 +15,11 @@ namespace git {
         int major;
         int minor;
         int rev;
+
+        std::ostream& display(std::ostream& out) const;
     };
+
+    inline std::ostream& operator<<(std::ostream& out, version_t const& v) { return v.display(out); }
 
     version_t libgit2_version();
 
