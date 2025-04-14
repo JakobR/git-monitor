@@ -31,6 +31,31 @@ repository repository::open(char const* path)
     return repository(repo);
 }
 
+bool repository::is_bare() const
+{
+    return git_repository_is_bare(repo());
+}
+
+bool repository::is_worktree() const
+{
+    return git_repository_is_worktree(repo());
+}
+
+char const* repository::path() const
+{
+    return git_repository_path(repo());
+}
+
+char const* repository::workdir() const
+{
+    return git_repository_workdir(repo());
+}
+
+char const* repository::commondir() const
+{
+    return git_repository_commondir(repo());
+}
+
 bool repository::is_head_detached()
 {
     int result = git_repository_head_detached(repo());

@@ -58,6 +58,17 @@ namespace git {
 
         static repository open(char const* path);
 
+        bool is_bare() const;
+        bool is_worktree() const;
+
+        /// path of the repository (the .git folder for normal repositories)
+        char const* path() const;
+
+        /// path of the working directory (always NULL for bare repositories)
+        char const* workdir() const;
+
+        char const* commondir() const;
+
         bool is_head_detached();
         reference head();
 
