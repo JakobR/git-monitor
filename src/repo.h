@@ -82,6 +82,9 @@ private:
     /// NOTE: do not call this directly, use startCheck() instead to perform the check in a background thread
     check_result_t check();
 
+    void dropOldErrors(QDateTime const& now);
+    void deduplicateErrors();
+
 private slots:
     void checkCompleted();
 

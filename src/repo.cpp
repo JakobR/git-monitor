@@ -1,5 +1,7 @@
 #include "repo.h"
+#include <QHash>
 #include <QtConcurrent>
+#include <algorithm>
 #include <chrono>
 
 Repo::Repo(QObject *parent)
@@ -27,7 +29,7 @@ void Repo::updateSettings(RepoSettings new_settings)
         disable();
 
     reset();
-    m_settings = new_settings;
+    m_settings = std::move(new_settings);
 
     if (was_enabled)
         enable();
@@ -77,6 +79,7 @@ void Repo::startCheck()
     if (m_activity == RepoActivity::Checking)
         return;
     m_activity = RepoActivity::Checking;
+    qDebug() << "Starting check for repository " << m_settings.path;
 
     m_check_future = QtConcurrent::run([this]() -> check_result_t {
         return check();
@@ -90,6 +93,7 @@ Repo::check_result_t Repo::check()
     RepoStatistics stats;
     QList<QString> errors;
     stats.timestamp = QDateTime::currentDateTime();
+    qDebug() << "Checking repository " << m_settings.path;
 
     std::optional<git::repository> repo_opt;
     try {
@@ -143,21 +147,19 @@ void Repo::checkCompleted()
     if (m_check_watcher.isCanceled())
         return;  // the canceller should reset the activity to Idle
 
+    qDebug() << "Completed check for repository " << m_settings.path;
     auto [stats, errors] = m_check_watcher.result();
-
     m_statistics = stats;
+    dropOldErrors(stats.timestamp);  // use the timestamp of the current check as base
 
     if (!errors.isEmpty()) {
         m_status = RepoStatus::Error;
-
         qDebug() << "Errors while checking repository " << m_settings.path << ":";
-
         for (auto const& error : errors) {
             qDebug() << "Error:" << error;
             m_errors.push_back({m_statistics.timestamp, error});
         }
-
-        // TODO: deduplicate error messages and drop old ones eventually
+        deduplicateErrors();
     }
     else {
         m_status = stats.isOk() ? RepoStatus::Ok : RepoStatus::DirtyOrOutdated;
@@ -189,4 +191,33 @@ bool RepoStatistics::isOk() const
     if (branches_outdated > 0)
         return false;
     return true;
+}
+
+void Repo::dropOldErrors(QDateTime const& now)
+{
+    // drop errors older than 1 hour
+    auto it = std::remove_if(m_errors.begin(), m_errors.end(),
+        [&now](auto const &error) { return error.timestamp.secsTo(now) > 3600; });
+    m_errors.erase(it, m_errors.end());
+}
+
+void Repo::deduplicateErrors()
+{
+    // error message -> timestamp of latest occurrence
+    QHash<QString, QDateTime> error_map;
+    for (auto const& e : m_errors) {
+        auto it = error_map.find(e.message);
+        if (it == error_map.end())
+            error_map.insert(e.message, e.timestamp);
+        else if (e.timestamp > it.value())
+            it.value() = e.timestamp;
+    }
+
+    // drop all earlier duplicate messages from the error list
+    auto it = std::remove_if(m_errors.begin(), m_errors.end(),
+        [&error_map](auto const &e) {
+            Q_ASSERT(error_map.contains(e.message));
+            return e.timestamp < error_map.value(e.message);
+        });
+    m_errors.erase(it, m_errors.end());
 }
