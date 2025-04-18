@@ -16,7 +16,7 @@ struct RepoSettings
     // TODO: maybe we want to add a setting to select a subset of branches to monitor?
 
     QVariantMap toVariantMap() const;
-    static RepoSettings fromVariantMap(QVariantMap const& map);
+    [[nodiscard]] static RepoSettings fromVariantMap(QVariantMap const& map);
 
     /// Validate settings.
     /// @returns a list of error messages. Successful validation is indicated by an empty list.

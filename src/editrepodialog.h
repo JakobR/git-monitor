@@ -7,8 +7,6 @@ namespace Ui {
 class EditRepoDialog;
 }
 
-class RepoSettings;
-
 class EditRepoDialog : public QDialog
 {
     Q_OBJECT

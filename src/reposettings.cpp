@@ -3,25 +3,33 @@
 #include <QCoreApplication>
 #include <QDir>
 
+namespace {
+    inline constexpr char const* k_path = "path";
+    inline constexpr char const* k_warnOnUncommittedChanges = "warnOnUncommittedChanges";
+    inline constexpr char const* k_warnOnUnpushedCommits    = "warnOnUnpushedCommits";
+    inline constexpr char const* k_warnOnUnmergedCommits    = "warnOnUnmergedCommits";
+    inline constexpr char const* k_warnOnUnfetchedCommits   = "warnOnUnfetchedCommits";
+}
+
 QVariantMap RepoSettings::toVariantMap() const
 {
     QVariantMap map;
-    map["path"] = path;
-    map["warnOnUncommittedChanges"] = warnOnUncommittedChanges;
-    map["warnOnUnpushedCommits"   ] = warnOnUnpushedCommits;
-    map["warnOnUnmergedCommits"   ] = warnOnUnmergedCommits;
-    map["warnOnUnfetchedCommits"  ] = warnOnUnfetchedCommits;
+    map[k_path] = path;
+    map[k_warnOnUncommittedChanges] = warnOnUncommittedChanges;
+    map[k_warnOnUnpushedCommits   ] = warnOnUnpushedCommits;
+    map[k_warnOnUnmergedCommits   ] = warnOnUnmergedCommits;
+    map[k_warnOnUnfetchedCommits  ] = warnOnUnfetchedCommits;
     return map;
 }
 
 RepoSettings RepoSettings::fromVariantMap(QVariantMap const& map)
 {
     RepoSettings rs;
-    rs.path = map["path"].toString();
-    rs.warnOnUncommittedChanges = map["warnOnUncommittedChanges"].toBool();
-    rs.warnOnUnpushedCommits    = map["warnOnUnpushedCommits"   ].toBool();
-    rs.warnOnUnmergedCommits    = map["warnOnUnmergedCommits"   ].toBool();
-    rs.warnOnUnfetchedCommits   = map["warnOnUnfetchedCommits"  ].toBool();
+    rs.path = map[k_path].toString();
+    rs.warnOnUncommittedChanges = map[k_warnOnUncommittedChanges].toBool();
+    rs.warnOnUnpushedCommits    = map[k_warnOnUnpushedCommits   ].toBool();
+    rs.warnOnUnmergedCommits    = map[k_warnOnUnmergedCommits   ].toBool();
+    rs.warnOnUnfetchedCommits   = map[k_warnOnUnfetchedCommits  ].toBool();
     return rs;
 }
 
