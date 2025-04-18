@@ -21,6 +21,7 @@ namespace git {
 
     inline std::ostream& operator<<(std::ostream& out, version_t const& v) { return v.display(out); }
 
-    version_t libgit2_version();
+    version_t libgit2_compile_version();
+    version_t libgit2_runtime_version();
 
 }

@@ -16,7 +16,16 @@ void git::libgit2_shutdown()
     throw_on_git2_error(error);
 }
 
-version_t git::libgit2_version()
+version_t git::libgit2_compile_version()
+{
+    version_t ver;
+    ver.major = LIBGIT2_VER_MAJOR;
+    ver.minor = LIBGIT2_VER_MINOR;
+    ver.rev = LIBGIT2_VER_REVISION;
+    return ver;
+}
+
+version_t git::libgit2_runtime_version()
 {
     version_t ver;
     int error = git_libgit2_version(&ver.major, &ver.minor, &ver.rev);

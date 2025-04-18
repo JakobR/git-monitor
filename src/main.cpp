@@ -11,44 +11,19 @@
 
 int main(int argc, char* argv[])
 {
-    int error = 0;
-    qDebug() << "Starting";
+    fmt::println("Git Monitor version {}", GIT_MONITOR_VERSION);
+    fmt::println("libgit2: loaded version {}, compiled against version {}", fmt::streamed(git::libgit2_runtime_version()), fmt::streamed(git::libgit2_compile_version()));
+    fmt::println("Qt: loaded version {}, compiled against version {}", qVersion(), QT_VERSION_STR);
 
     git::libgit2_init();
 
-    fmt::println("libgit2 version {}", fmt::streamed(git::libgit2_version()));
-    fmt::println("Qt version {}", qVersion());
-
-    char const* repo_path = "/home/jakob/testrepo";
-
-    {
-        auto repo = git::repository::open(repo_path);
-        auto uncommitted = repo.uncommitted_changes();
-        auto unpushed_head = repo.head_ahead_behind();
-        auto unpushed_all = repo.total_ahead_behind();
-        auto remote_state = repo.check_remote_state();
-        fmt::println("");
-        fmt::println("uncommitted changes: {}" , uncommitted);
-        fmt::println("HEAD: {} ahead, {} behind, remote state: {}", unpushed_head->ahead, unpushed_head->behind, remote_state.head_state);
-        fmt::println("Total over all branches: {} ahead, {} behind, remote state: {} up to date, {} outdated", unpushed_all.ahead, unpushed_all.behind, remote_state.branches_up_to_date, remote_state.branches_outdated);
-        if (!remote_state.errors.empty())
-            fmt::println("Remote Errors:\n    {}", fmt::join(remote_state.errors, "\n    "));
-        auto main = repo.lookup_local_branch("main");
-        if (main) {
-            auto main_upstream = main->branch_upstream();
-            fmt::println("main: {}", main->resolve().target());
-            if (main_upstream)
-                fmt::println("main: -> {}", main_upstream->name());
-        }
-    }
-
-    // return 0;
+    QApplication app(argc, argv);
 
     QCoreApplication::setOrganizationName("Jakob Rath");
     QCoreApplication::setOrganizationDomain("jakobrath.eu");
     QCoreApplication::setApplicationName("Git Monitor");
+    QCoreApplication::setApplicationVersion(GIT_MONITOR_VERSION);
 
-    QApplication app(argc, argv);
 
     RepoManager repoManager;
 

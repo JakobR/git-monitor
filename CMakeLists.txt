@@ -50,6 +50,11 @@ qt_add_executable(git-monitor
     src/repo.cpp
 )
 
+target_compile_definitions(git-monitor
+    PRIVATE
+        GIT_MONITOR_VERSION="${version}"
+)
+
 target_link_libraries(git-monitor
     PRIVATE
         Qt::Core
