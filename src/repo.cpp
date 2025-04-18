@@ -4,8 +4,9 @@
 #include <QtConcurrent>
 #include <algorithm>
 
-Repo::Repo(QObject *parent)
+Repo::Repo(size_t index, QObject* parent)
     : QObject{parent}
+    , m_index{index}
 {
     m_recheck_timer = new QTimer(this);
     m_recheck_timer->setInterval(m_recheck_interval);

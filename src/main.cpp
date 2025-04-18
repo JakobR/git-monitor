@@ -26,6 +26,7 @@ int main(int argc, char* argv[])
 
 
     RepoManager repoManager;
+    repoManager.readSettings();
 
     MainWindow w;
     w.show();

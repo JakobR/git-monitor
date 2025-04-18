@@ -63,7 +63,7 @@ class Repo : public QObject
 {
     Q_OBJECT
 public:
-    explicit Repo(QObject *parent = nullptr);
+    explicit Repo(size_t index, QObject* parent = nullptr);
 
     RepoSettings const& settings() const;
     void updateSettings(RepoSettings new_settings);
@@ -75,6 +75,8 @@ public:
 
     /// disable automatic checking
     void disable();
+
+    size_t index() const { return m_index; }
 
     RepoStatus status() const { return m_status; }
     RepoActivity activity() const { return m_activity; }
@@ -103,6 +105,7 @@ signals:
     void changed();
 
 private:
+    size_t m_index;  //< index in the RepoManager
     RepoSettings m_settings;
 
     RepoStatus m_status = RepoStatus::Unknown;
