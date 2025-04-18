@@ -39,8 +39,14 @@
       <attribute name="horizontalHeaderDefaultSectionSize">
        <number>150</number>
       </attribute>
+      <attribute name="horizontalHeaderHighlightSections">
+       <bool>false</bool>
+      </attribute>
       <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
        <bool>true</bool>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
       </attribute>
      </widget>
     </item>
@@ -57,6 +63,19 @@
         <property name="text">
          <string>&amp;Add...</string>
         </property>
+        <property name="shortcut">
+         <string>Ctrl+N</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="editRepoButton">
+        <property name="text">
+         <string>&amp;Edit...</string>
+        </property>
+        <property name="shortcut">
+         <string>Ctrl+E</string>
+        </property>
        </widget>
       </item>
       <item>
@@ -71,6 +90,23 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="aboutButton">
+        <property name="text">
+         <string>About...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="quitButton">
+        <property name="text">
+         <string>&amp;Quit</string>
+        </property>
+        <property name="shortcut">
+         <string>Ctrl+Q</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>

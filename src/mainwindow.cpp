@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     m_ui->setupUi(this);
 
+    connect(m_ui->quitButton, &QPushButton::clicked, qApp, &QCoreApplication::quit);
+
     m_repoTableModel = new RepoTableModel(this);
     m_sortFilterModel = new QSortFilterProxyModel(this);
     m_sortFilterModel->setSourceModel(m_repoTableModel);
