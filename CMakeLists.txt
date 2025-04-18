@@ -48,6 +48,14 @@ qt_add_executable(git-monitor
     src/repomanager.cpp
     src/repo.h
     src/repo.cpp
+    src/trayicon.h
+    src/trayicon.cpp
+)
+
+qt_add_resources(git-monitor "images"
+    PREFIX "/"
+    FILES
+        images/Git-Icon-Black.png
 )
 
 target_compile_definitions(git-monitor

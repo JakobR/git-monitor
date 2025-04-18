@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "repomanager.h"
+#include "trayicon.h"
 #include "git/git.h"
 
 #include <QApplication>
@@ -28,18 +29,25 @@ int main(int argc, char* argv[])
 #endif
     QCoreApplication::setApplicationVersion(GIT_MONITOR_VERSION);
 
+    QApplication::setQuitOnLastWindowClosed(false);
+
 
     RepoManager repoManager;
     repoManager.readSettings();
 
+    TrayIcon trayIcon;
+    trayIcon.setRepoManager(&repoManager);
+    trayIcon.show();
+
     MainWindow w;
     w.setRepoManager(&repoManager);
+    QObject::connect(&trayIcon, &TrayIcon::showSettings, &w, &MainWindow::show);
     w.show();
     int result = app.exec();
     qDebug() << "Exiting:" << result;
 
     // this is optional if the application is exiting anyway
-    git::libgit2_shutdown();
+    // git::libgit2_shutdown();
 
     return result;
 }
