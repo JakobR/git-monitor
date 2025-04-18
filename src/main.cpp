@@ -4,6 +4,7 @@
 #include "git/git.h"
 
 #include <QApplication>
+#include <QCommandLineParser>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <fmt/ranges.h>
@@ -32,6 +33,16 @@ int main(int argc, char* argv[])
     QApplication::setQuitOnLastWindowClosed(false);
 
 
+    QCommandLineParser parser;
+    parser.setApplicationDescription(QCoreApplication::applicationName());
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    QCommandLineOption hide("hide", QCoreApplication::translate("main", "Hide the settings window on startup"));
+    parser.addOption(hide);
+
+    parser.process(app);
+
     RepoManager repoManager;
     repoManager.readSettings();
 
@@ -42,7 +53,10 @@ int main(int argc, char* argv[])
     MainWindow w;
     w.setRepoManager(&repoManager);
     QObject::connect(&trayIcon, &TrayIcon::showSettings, &w, &MainWindow::show);
-    w.show();
+
+    if (!parser.isSet(hide))
+        w.show();
+
     int result = app.exec();
     qDebug() << "Exiting:" << result;
 
