@@ -1,0 +1,1 @@
+`Git-Icon-Black.png` by Jason Long, obtained via <https://git-scm.com/downloads/logos>, is licensed under the [Creative Commons Attribution 3.0 Unported License](<https://creativecommons.org/licenses/by/3.0/>).
