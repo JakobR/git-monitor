@@ -21,7 +21,11 @@ int main(int argc, char* argv[])
 
     QCoreApplication::setOrganizationName("Jakob Rath");
     QCoreApplication::setOrganizationDomain("jakobrath.eu");
+#ifdef QT_DEBUG
+    QCoreApplication::setApplicationName("Git Monitor (Debug Mode)");
+#else
     QCoreApplication::setApplicationName("Git Monitor");
+#endif
     QCoreApplication::setApplicationVersion(GIT_MONITOR_VERSION);
 
 
