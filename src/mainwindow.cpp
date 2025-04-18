@@ -1,5 +1,3 @@
-#include <QSortFilterProxyModel>
-
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "repotablemodel.h"
@@ -7,21 +5,32 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    , m_ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+    m_ui->setupUi(this);
 
-    auto* model = new RepoTableModel(this);
-    auto* filterModel = new QSortFilterProxyModel(this);
-    filterModel->setSourceModel(model);
-    ui->repoTableView->setModel(filterModel);
+    m_repoTableModel = new RepoTableModel(this);
+    m_sortFilterModel = new QSortFilterProxyModel(this);
+    m_sortFilterModel->setSourceModel(m_repoTableModel);
+    m_ui->repoTableView->setModel(m_sortFilterModel);
+
+    auto* header = m_ui->repoTableView->horizontalHeader();
+    header->setSectionResizeMode(RepoTableModel::Column::Path, QHeaderView::Stretch);
+    header->setSectionResizeMode(RepoTableModel::Column::Status, QHeaderView::Fixed);
+    header->resizeSection(RepoTableModel::Column::Status, 120);
+    header->setSortIndicator(RepoTableModel::Column::Path, Qt::SortOrder::AscendingOrder);
 
     readSettings();
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    delete m_ui;
+}
+
+void MainWindow::setRepoManager(RepoManager* repoManager)
+{
+    m_repoTableModel->setRepoManager(repoManager);
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
@@ -34,26 +43,27 @@ void MainWindow::readSettings()
 {
     QSettings settings;
     restoreGeometry(settings.value(Settings::MainWindow::Geometry).toByteArray());
-    ui->repoTableView->horizontalHeader()->restoreState(settings.value(Settings::MainWindow::TableHeaderState).toByteArray());
+    m_ui->repoTableView->horizontalHeader()->restoreState(settings.value(Settings::MainWindow::TableHeaderState).toByteArray());
+    m_sortFilterModel->invalidate();
 }
 
 void MainWindow::writeSettings()
 {
     QSettings settings;
     settings.setValue(Settings::MainWindow::Geometry, saveGeometry());
-    settings.setValue(Settings::MainWindow::TableHeaderState, ui->repoTableView->horizontalHeader()->saveState());
+    settings.setValue(Settings::MainWindow::TableHeaderState, m_ui->repoTableView->horizontalHeader()->saveState());
 }
 
 void MainWindow::on_addRepoButton_clicked()
 {
-    if (!editRepoDialog)
-        editRepoDialog = new EditRepoDialog(this);
-    editRepoDialog->prepare(nullptr);
+    if (!m_editRepoDialog)
+        m_editRepoDialog = new EditRepoDialog(this);
+    m_editRepoDialog->prepare(nullptr);
 
-    int result = editRepoDialog->exec();
-    if (!result) {
-        qDebug() << "cancelled";
-    }
+    int result = m_editRepoDialog->exec();
+    if (!result)
+        return;  // dialog was cancelled
 
-    qDebug() << "result: " << result;
+    RepoSettings rs = m_editRepoDialog->values();
+    m_repoTableModel->addRepo(std::move(rs));
 }

@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
     repoManager.readSettings();
 
     MainWindow w;
+    w.setRepoManager(&repoManager);
     w.show();
     int result = app.exec();
     qDebug() << "Exiting:" << result;
