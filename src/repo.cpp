@@ -1,5 +1,6 @@
 #include "repo.h"
 #include <QHash>
+#include <QThread>
 #include <QtConcurrent>
 #include <algorithm>
 
@@ -91,6 +92,7 @@ void Repo::startCheck()
     m_check_watcher.setFuture(m_check_future);
 }
 
+// NOTE: this function runs in a separate thread
 Repo::check_result_t Repo::check()
 {
     RepoStatistics stats;
@@ -100,7 +102,7 @@ Repo::check_result_t Repo::check()
 
     std::optional<git::repository> repo_opt;
     try {
-        git::repository repo = git::repository::open(m_settings.path.toStdString().c_str());
+        repo_opt = git::repository::open(m_settings.path.toStdString().c_str());
     }
     catch (std::exception const& e) {
         errors.push_back(tr("Unable to open repository: %1").arg(e.what()));
@@ -141,6 +143,10 @@ Repo::check_result_t Repo::check()
     catch (std::exception const& e) {
         errors.push_back(tr("Unable to check remote state: %1").arg(e.what()));
     }
+
+#ifdef QT_DEBUG
+    QThread::sleep(1);  // sleep for 1 second to simulate a long-running operation
+#endif
 
     return {stats, errors};
 }
