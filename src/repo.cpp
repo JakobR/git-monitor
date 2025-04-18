@@ -30,12 +30,21 @@ void Repo::updateSettings(RepoSettings new_settings)
 
     if (was_enabled)
         enable();
+    emit changed();
+}
+
+void Repo::setActivity(RepoActivity activity)
+{
+    if (m_activity == activity)
+        return;
+    m_activity = activity;
+    // emit activityChanged();
 }
 
 void Repo::reset()
 {
     m_status = RepoStatus::Unknown;
-    m_activity = RepoActivity::Idle;
+    setActivity(RepoActivity::Idle);
     m_statistics = RepoStatistics{};
     m_errors.clear();
 }
@@ -65,6 +74,8 @@ void Repo::enable()
     // QFileSystemWatcher* watcher = new QFileSystemWatcher(this);
     // watcher->addPath(m_settings.path());
     // ...
+
+    emit changed();
 }
 
 void Repo::disable()
@@ -75,14 +86,17 @@ void Repo::disable()
 
     m_recheck_timer->stop();
     m_check_future.cancel();
+    m_check_watcher.cancel();
     reset();
+
+    emit changed();
 }
 
 void Repo::startCheck()
 {
-    if (m_activity == RepoActivity::Checking)
+    if (activity() == RepoActivity::Checking)
         return;
-    m_activity = RepoActivity::Checking;
+    setActivity(RepoActivity::Checking);
     qDebug() << "Starting check for repository " << m_settings.path;
 
     m_check_future = QtConcurrent::run([this]() -> check_result_t {
@@ -90,6 +104,8 @@ void Repo::startCheck()
     });
 
     m_check_watcher.setFuture(m_check_future);
+
+    emit changed();
 }
 
 // NOTE: this function runs in a separate thread
@@ -174,12 +190,12 @@ void Repo::checkCompleted()
         m_status = stats.isOk() ? RepoStatus::Ok : RepoStatus::DirtyOrOutdated;
     }
 
-    m_activity = RepoActivity::Idle;
+    setActivity(RepoActivity::Idle);
 
     // reset interval until next check
     m_recheck_timer->setInterval(m_recheck_interval);
 
-    // TODO: emit signal to notify about the new status
+    emit changed();
 }
 
 bool RepoStatistics::isOk() const

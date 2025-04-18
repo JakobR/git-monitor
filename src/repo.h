@@ -68,11 +68,18 @@ public:
     RepoSettings const& settings() const;
     void updateSettings(RepoSettings new_settings);
 
+    bool isEnabled() const { return m_enabled; }
+
     /// enable automatic checking (triggered by timeout and filesystem changes)
     void enable();
 
     /// disable automatic checking
     void disable();
+
+    RepoStatus status() const { return m_status; }
+    RepoActivity activity() const { return m_activity; }
+    RepoStatistics const& statistics() const { return m_statistics; }
+    QList<RepoCheckError> const& errors() const { return m_errors; }
 
 private:
     void reset();
@@ -86,10 +93,14 @@ private:
     void dropOldErrors(QDateTime const& now);
     void deduplicateErrors();
 
+    void setActivity(RepoActivity activity);
+
 private slots:
     void checkCompleted();
 
 signals:
+    // void activityChanged();
+    void changed();
 
 private:
     RepoSettings m_settings;
