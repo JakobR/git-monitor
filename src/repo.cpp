@@ -2,17 +2,13 @@
 #include <QHash>
 #include <QtConcurrent>
 #include <algorithm>
-#include <chrono>
 
 Repo::Repo(QObject *parent)
     : QObject{parent}
 {
-    using namespace std::literals::chrono_literals;
-
     m_recheck_timer = new QTimer(this);
-    auto recheck_interval = 5min;
-    auto recheck_interval_ms = std::chrono::duration_cast<std::chrono::milliseconds>(recheck_interval);
-    m_recheck_timer->setInterval(recheck_interval_ms);
+    m_recheck_timer->setInterval(m_recheck_interval);
+    connect(m_recheck_timer, &QTimer::timeout, this, &Repo::startCheck);
 
     connect(&m_check_watcher, &QFutureWatcher<check_result_t>::finished, this, &Repo::checkCompleted);
 }
@@ -48,6 +44,13 @@ void Repo::enable()
     if (m_enabled)
         return;
     m_enabled = true;
+
+    qDebug() << "Enabling checking for repository " << m_settings.path;
+
+    // initial check should be done immediately
+    // TODO: add random delay to avoid filesystem burst? (maybe index * 0.5 seconds on startup)
+    if (m_status == RepoStatus::Unknown)
+        m_recheck_timer->setInterval(std::chrono::milliseconds(500));
 
     m_recheck_timer->start();
 
@@ -166,6 +169,9 @@ void Repo::checkCompleted()
     }
 
     m_activity = RepoActivity::Idle;
+
+    // reset interval until next check
+    m_recheck_timer->setInterval(m_recheck_interval);
 
     // TODO: emit signal to notify about the new status
 }

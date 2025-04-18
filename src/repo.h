@@ -11,6 +11,7 @@
 #include <QObject>
 #include <QString>
 #include <QTimer>
+#include <chrono>
 #include <optional>
 #include <utility>
 
@@ -99,7 +100,9 @@ private:
 
     bool m_enabled = false;
 
+    std::chrono::milliseconds m_recheck_interval = std::chrono::minutes(5);
     QTimer* m_recheck_timer = nullptr;
+
     QFileSystemWatcher* m_watcher = nullptr;
 
     QList<RepoCheckError> m_errors;
