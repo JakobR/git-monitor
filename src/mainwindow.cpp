@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_ui(new Ui::MainWindow)
 {
     m_ui->setupUi(this);
+    m_ui->statusBar->hide();
 
     connect(m_ui->quitButton, &QPushButton::clicked, qApp, &QCoreApplication::quit);
 
