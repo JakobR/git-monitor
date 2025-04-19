@@ -130,32 +130,40 @@ Repo::check_result_t Repo::check()
     git::repository& repo = *repo_opt;
 
     try {
-        stats.uncommitted = repo.uncommitted_changes();
+        if (settings().warnOnUncommittedChanges)
+            stats.uncommitted = repo.uncommitted_changes();
     }
     catch (std::exception const& e) {
         errors.push_back(tr("Unable to check uncommitted changes: %1").arg(e.what()));
     }
 
     try {
-        stats.head_ahead_behind = repo.head_ahead_behind();
+        if (settings().warnOnUnpushedCommits || settings().warnOnUnmergedCommits)
+            stats.head_ahead_behind = repo.head_ahead_behind();
     }
     catch (std::exception const& e) {
         errors.push_back(tr("Unable to check HEAD ahead/behind: %1").arg(e.what()));
     }
 
     try {
-        stats.total_ahead_behind = repo.total_ahead_behind();
+        if (settings().warnOnUnpushedCommits || settings().warnOnUnmergedCommits)
+            stats.total_ahead_behind = repo.total_ahead_behind();
     }
     catch (std::exception const& e) {
         errors.push_back(tr("Unable to check total ahead/behind: %1").arg(e.what()));
     }
 
     try {
-        auto remote_state = repo.check_remote_state();
-        stats.head_state = remote_state.head_state;
-        stats.branches_outdated = remote_state.branches_outdated;
-        for (auto const& error : remote_state.errors)
-            errors.push_back(tr("Error checking remote state: %1").arg(QString::fromStdString(error)));
+        if (settings().warnOnUnfetchedCommits) {
+            auto remote_state = repo.check_remote_state();
+            stats.head_state = remote_state.head_state;
+            if (remote_state.errors.empty()) {
+                // we only take the value if there were no errors, to avoid showing "OK" when in error state.
+                stats.branches_outdated = remote_state.branches_outdated;
+            }
+            for (auto const& error : remote_state.errors)
+                errors.push_back(tr("Error checking remote state: %1").arg(QString::fromStdString(error)));
+        }
     }
     catch (std::exception const& e) {
         errors.push_back(tr("Unable to check remote state: %1").arg(e.what()));
