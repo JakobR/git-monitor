@@ -2,6 +2,7 @@
 
 #include "oid.h"
 #include <fmt/core.h>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -15,6 +16,11 @@ namespace git {
     struct remote_ref {
         std::string name;
         oid id;
+    };
+
+    struct credential {
+        std::string username;
+        std::string password;
     };
 
     class remote {
@@ -53,6 +59,9 @@ namespace git {
         // e.g., typically "refs/remotes/origin/main" on the local repo is fetched from "refs/heads/main" on the remote repo,
         // in which case this function would transform "refs/remotes/origin/main" into "refs/heads/main".
         std::optional<std::string> get_remote_branch(char const* remote_tracking_name);
+
+        using acquire_credentials_t = std::function<std::optional<credential>(char const* url, char const* username_from_url)>;
+        void set_acquire_credentials_callback(acquire_credentials_t callback);
     };
 
 }

@@ -88,7 +88,7 @@ namespace git {
         std::vector<std::string> remotes();
         std::optional<remote> lookup_remote(char const* name);
 
-        remote_state_t check_remote_state();
+        remote_state_t check_remote_state(remote::acquire_credentials_t credentials_callback = nullptr);
     };
 
 }

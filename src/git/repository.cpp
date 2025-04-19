@@ -211,7 +211,7 @@ std::optional<remote> repository::lookup_remote(char const* name)
     return {remote{remote_raw}};
 }
 
-remote_state_t repository::check_remote_state()
+remote_state_t repository::check_remote_state(remote::acquire_credentials_t credentials_callback)
 {
     remote_state_t result;
     std::vector<std::string>& errors = result.errors;
@@ -268,6 +268,8 @@ remote_state_t repository::check_remote_state()
         fmt::println("Querying remote {}...", remote->name());
         if (!remote)
             continue;
+
+        remote->set_acquire_credentials_callback(credentials_callback);
 
         using remote_branch_name_t = std::string;
         std::map<remote_branch_name_t, std::vector<size_t>> remote_branch_to_info;

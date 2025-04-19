@@ -6,7 +6,7 @@
 using namespace git;
 
 struct remote::callbacks_t {
-    // TODO: we will need at least the credential_acquire_cb
+    acquire_credentials_t acquire_credentials;
 
     callbacks_t() = default;
     ~callbacks_t() = default;
@@ -46,11 +46,29 @@ bool remote::is_connected() const
     return git_remote_connected(m_remote.get());
 }
 
+void remote::set_acquire_credentials_callback(acquire_credentials_t callback)
+{
+    m_callbacks->acquire_credentials = std::move(callback);
+}
+
 int remote::callbacks_t::credential_acquire_cb(git_credential** out, char const* url, char const* username_from_url, unsigned int allowed_types, void* payload)
 {
     callbacks_t* cb = static_cast<callbacks_t*>(payload);
 
-    // TODO: implement
+    // we only support username/password authentication for now
+    if (allowed_types & GIT_CREDENTIAL_USERPASS_PLAINTEXT) {
+        if (cb->acquire_credentials) {
+            auto cred = cb->acquire_credentials(url, username_from_url);
+            if (cred) {
+                int error = git_credential_userpass_plaintext_new(out, cred->username.c_str(), cred->password.c_str());
+                throw_on_git2_error(error);
+                return 0;  // success
+            }
+        }
+    }
+    else {
+        fmt::println("no supported credential types: {}", allowed_types);
+    }
 
     // return value:
     //  0 for success
