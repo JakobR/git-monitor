@@ -155,7 +155,10 @@ Repo::check_result_t Repo::check()
 
     try {
         if (settings().warnOnUnfetchedCommits) {
-            auto remote_state = repo.check_remote_state();
+            auto acquire_credentials = [this, &errors](char const* url, char const* username_from_url) -> std::optional<git::credential> {
+                return this->acquireCredentials(url, errors);
+            };
+            auto remote_state = repo.check_remote_state(std::move(acquire_credentials));
             stats.head_state = remote_state.head_state;
             if (remote_state.errors.empty()) {
                 // we only take the value if there were no errors, to avoid showing "OK" when in error state.
@@ -174,6 +177,59 @@ Repo::check_result_t Repo::check()
 #endif
 
     return {stats, errors};
+}
+
+// TODO: git-credential may show a GUI dialog to ask for credentials. We should avoid that during background checking.
+/// Calls git-credential(1) to acquire credentials.
+std::optional<git::credential> Repo::acquireCredentials(char const* url, QList<QString>& errors)
+{
+    qDebug() << "acquireCredentials called with url:" << url;
+
+    QProcess git_credential;
+    connect(&git_credential, &QProcess::errorOccurred, this, [this, &errors](QProcess::ProcessError error) {
+        errors.push_back(tr("git-credential process error: %1").arg(error));
+    });
+    git_credential.setProcessChannelMode(QProcess::ForwardedErrorChannel);
+    git_credential.start("git", {"credential", "fill"});
+    if (!git_credential.waitForStarted()) {
+        errors.push_back(tr("Unable to start git-credential process"));
+        return std::nullopt;
+    }
+    git_credential.write(QString("url=%1\n").arg(url).toUtf8());
+    git_credential.closeWriteChannel();
+    if (!git_credential.waitForFinished()) {
+        errors.push_back(tr("git-credential process did not finish"));
+        return std::nullopt;
+    }
+    if (git_credential.exitCode() != 0) {
+        errors.push_back(tr("git-credential process failed with exit code %1").arg(git_credential.exitCode()));
+        return std::nullopt;
+    }
+
+    QByteArray output = git_credential.readAllStandardOutput();
+
+    std::optional<std::string> username;
+    std::optional<std::string> password;
+    for (auto const& line : output.split('\n')) {
+        auto const sep_idx = line.indexOf('=');
+        if (sep_idx == -1)
+            continue;  // skip invalid lines
+        auto const key = line.first(sep_idx).trimmed();
+        auto const value = line.sliced(sep_idx + 1).trimmed();
+        if (key == "username")
+            username = value.toStdString();
+        else if (key == "password")
+            password = value.toStdString();
+    }
+    if (username && password) {
+        return git::credential{
+            .username = *std::move(username),
+            .password = *std::move(password),
+        };
+    }
+
+    errors.push_back(tr("git-credential did not return username and password"));
+    return std::nullopt;
 }
 
 void Repo::checkCompleted()

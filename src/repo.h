@@ -97,6 +97,8 @@ private:
 
     void setActivity(RepoActivity activity);
 
+    std::optional<git::credential> acquireCredentials(char const* url, QList<QString>& errors);
+
 private slots:
     void checkCompleted();
 
