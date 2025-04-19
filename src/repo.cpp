@@ -265,23 +265,23 @@ void Repo::checkCompleted()
 
 bool RepoStatistics::isOk() const
 {
-    if (uncommitted > 0)
+    if (uncommitted && *uncommitted > 0)
         return false;
     // head stats are subsumed by the total stats so don't really need to check both
     if (head_ahead_behind && head_ahead_behind->ahead > 0)
         return false;
     if (head_ahead_behind && head_ahead_behind->behind > 0)
         return false;
-    if (total_ahead_behind.ahead > 0)
+    if (total_ahead_behind && total_ahead_behind->ahead > 0)
         return false;
-    if (total_ahead_behind.behind > 0)
+    if (total_ahead_behind && total_ahead_behind->behind > 0)
         return false;
-    // unknown and up_to_date are both ok
+    // head_state: unknown and up_to_date are both ok
     if (head_state == git::branch_state::outdated)
         return false;
     if (head_state == git::branch_state::connection_error)
         return false;
-    if (branches_outdated > 0)
+    if (branches_outdated && *branches_outdated > 0)
         return false;
     return true;
 }

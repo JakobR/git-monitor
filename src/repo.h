@@ -40,16 +40,16 @@ struct RepoStatistics {
     /// when the check was started
     QDateTime timestamp;
     /// number of uncommitted changes
-    size_t uncommitted = 0;
+    std::optional<size_t> uncommitted;
     /// number of unpushed and unmerged commits on HEAD branch
     /// is empty if HEAD is detached or does not have a remote-tracking branch
     std::optional<git::ahead_behind_t> head_ahead_behind;
     /// number of unpushed and unmerged commits across all branches
-    git::ahead_behind_t total_ahead_behind;
+    std::optional<git::ahead_behind_t> total_ahead_behind;
     /// whether HEAD's remote-tracking branch differs from the commit advertised by the remote repository
     git::branch_state head_state = git::branch_state::unknown;
     /// number of remote-tracking branches that differ from their remote repository
-    size_t branches_outdated = 0;
+    std::optional<size_t> branches_outdated;
 
     bool isOk() const;
 };
