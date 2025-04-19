@@ -54,6 +54,10 @@ void TrayIcon::show()
 void TrayIcon::on_systemTrayIcon_activated(QSystemTrayIcon::ActivationReason reason)
 {
     qDebug() << "Tray icon activated with reason:" << reason;
+
+    if (reason == QSystemTrayIcon::Trigger) {
+        emit showSettings();
+    }
 }
 
 void TrayIcon::on_repo_changed(Repo* repo)
